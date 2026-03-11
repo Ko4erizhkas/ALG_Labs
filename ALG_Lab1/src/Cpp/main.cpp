@@ -8,25 +8,39 @@
 using namespace std;
 /**/
 
-pair<int, vector<int>> naiveString(const string& text, const string& pattern)
+tuple<int, vector<int>, int, int> naiveString(const string& text, const string& pattern)
 {
 	vector<int> ans;
+    vector<int> js;
 	int n = text.length();
 	int m = pattern.length();
 
+    int j_center = 0;
+    int j_help = 0;
+
 	for (int i = 0; i < n - m + 1; i++)
 	{
-		int j = 0;
-		while (j < m && text[i + j] == pattern[j])
+        int j = 0;
+        while (j < m && text[i + j] == pattern[j])
 		{
 			j++;
+            //запихнуть j в массив, ниже посчитать среднее и колво в массиве
+            js.push_back(j);
 		}
 		if (j == m) 
 		{ 
 			ans.push_back(i);
 		}
 	}
-	return { ans.size(), ans };
+    if (!js.empty())
+    {
+        for (int x : js)
+        {
+            j_help += x;
+        }
+        j_center = j_help / js.size();
+    }
+	return { ans.size(), ans, j_center, js.size()};
 }
 string readFile(const string& filename)
 {
@@ -68,17 +82,22 @@ int main()
     getline(cin, pattern);
 
     auto start = chrono::high_resolution_clock::now();
-    pair<int, vector<int>> result = naiveString(text, pattern);
+    auto result = naiveString(text, pattern);
     auto end = chrono::high_resolution_clock::now();
 
     chrono::duration<double, milli> duration = end - start;
 
-    cout << "Number of occurrences: " << result.first << endl;
+    cout << "Number of occurrences: " << get<0>(result) << endl;
     cout << "Positions of occurrences: ";
-    for (int pos : result.second)
+    for (int pos : get<1>(result))
     {
         cout << pos << " ";
     }
+    cout << endl;
+    // j_center (see in function -> naivString)
+    cout << get<2>(result) << endl;
+    // js.size() (see in function -> naivString)
+    cout << get<3>(result);
     cout << endl;
     cout << "Execution time: " << duration.count() << " ms" << endl;
     
@@ -91,17 +110,22 @@ int main()
     getline(cin, pattern1);
 
     auto start1 = chrono::high_resolution_clock::now();
-    pair<int, vector<int>> result1 = naiveString(text1, pattern1);
+    auto result1 = naiveString(text1, pattern1);
     auto end1 = chrono::high_resolution_clock::now();
 
     chrono::duration<double, milli> duration1 = end1 - start1;
 
-    cout << "Number of occurrences: " << result1.first << endl;
+    cout << "Number of occurrences: " << get<0>(result1)<< endl;
     cout << "Positions of occurrences: ";
-    for (int pos : result1.second)
+    for (int pos : get<1>(result1))
     {
         cout << pos << " ";
     }
+    cout << endl;
+    // j_center (see in function -> naivString)
+    cout << get<2>(result1) << endl;
+    // js.size() (see in function -> naivString)
+    cout << get<3>(result1);
     cout << endl;
     cout << "Execution time: " << duration1.count() << " ms" << endl;
 
